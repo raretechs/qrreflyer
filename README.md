@@ -37,6 +37,8 @@ composer install
    - Upload property images
    - Enter agent information
    - Optionally, enter a custom URL for the QR code
+   - NOTE 1: Sample_Data provided for testing
+   - NOTE 2: For testing any website should be used
 
 3. Submit the form.
 
