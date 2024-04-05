@@ -1,0 +1,133 @@
+@charset "utf-8";
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    width: 8.5in; /* Set width for US Letter paper */
+}
+
+.header {
+    background-color: #900305;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    width: 100%;
+}
+
+.header .left h1 {
+    font-size: 25px; /* Adjust font size for property address */
+    line-height: .5; /* Reduce line spacing */
+}
+
+.header .left h2 {
+    font-size: 18px; /* Adjust font size for property address */
+    line-height: .5; /* Reduce line spacing */
+}
+
+.header .right h1 {
+    font-size: 44px; /* Adjust font size for price */
+    line-height: .1; /* Reduce line spacing */
+}
+
+.header .left,
+.header .right {
+    color: #fff;
+}
+
+.hero {
+    width: 100%;
+    overflow: hidden;
+}
+
+.hero .hero-image img {
+    width: 100%;
+    display: block;
+}
+
+.body {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    width: 100%;
+}
+
+.body .left {
+    width: 60%; /* Set width to 60% for the description */
+    padding-right: 20px; /* Add right padding to create space between description and gallery */
+}
+
+.body .right {
+    width: 40%; /* Set width to 40% for the gallery */
+}
+
+.body .gallery {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 5px; /* Adjust gap between rows */
+    grid-column-gap: 5px; /* Adjust gap between columns */
+}
+
+.body .gallery img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: cover;
+	border: 4px solid #900305; /* Add border around each image */
+}
+
+.contact_and_scan {
+	display: flex;
+	justify-content: space-between;
+	width: 100%;
+}
+
+.contact_info {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    width: 50%; /* Set width to 50% */
+}
+
+.contact_info .left img {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.contact_info .right {
+    width: 100%;
+}
+
+.contact_info .contact_details p {
+    margin: 0; /* Remove default margin for contact info */
+    line-height: 1;
+}
+
+.scan_info {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px;
+    width: 50%; /* Set width to 50% */
+}
+
+.scan_info img {
+    max-width: 150px; /* Adjust size as needed */
+    max-height: 150px; /* Adjust size as needed */
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+.footer {
+	background-color: #900305; /* Match background color with header */
+	color: #fff; /* Match text color with header */
+    text-align: center;
+    padding: 10px;
+    width: 100%;
+	line-height: 0.1; /* Adjust line spacing */
+}

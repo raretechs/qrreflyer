@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>QR Flyer</title>
+<link href="main.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<header class="header">
+    <div class="left">
+        <div class="property_details">
+            <h1>{Property Address}</h1>
+            <h2>{Property Details}</h2>
+        </div>
+    </div>
+    <div class="right">
+        <div class="pricing_details">
+            <p>OFFERED AT</p>
+            <h1>{Price}</h1>
+        </div>
+    </div>
+</header>
+<section class="hero">
+    <div class="hero-image">
+        <img src="{Hero Image}" alt="Hero Image">
+    </div>
+</section>
+<section class="body">
+    <div class="left">
+        <div class="headline">
+            <h1>About This Property</h1>
+        </div>
+        <div class="property_description">
+            <p>{Property Description}</p>
+        </div>
+    </div>
+    <div class="right">
+        <div class="gallery">
+            {Gallery Images}
+        </div>
+    </div>
+</section>
+<section class="contact_and_scan">
+    <section class="contact_info">
+        <div class="left">
+            <img src="{Agent Photo}" alt="Contact Image">
+        </div>
+        <div class="right">
+            <div class="contact_details">
+                <p>Name: {Agent Name}</p>
+                <p>Title: {Agent Title}</p>
+                <p>License Number: {Agent License Number}</p>
+                <p>Mobile: {Agent Mobile}</p>
+                <p>Office: {Agent Office}</p>
+                <p>Email: {Agent Email}</p>
+                <p>Website: {Agent Website}</p>
+            </div>
+        </div>
+    </section>
+    <section class="scan_info">
+        <div class="left">
+            <img src="images/scan_me.jpg" alt="Scan Me">
+        </div>
+        <div class="right">
+            <img src="{QR Code}" alt="QR Code">
+        </div>
+    </section>
+</section>
+<section class="footer">
+    <div class="logo">
+        <img src="images/logo.png" alt="Your Logo" width="150" height="42">
+    </div>
+    <p>11111 Main Street, Suite#A, Your City, ST 00000</p>
+</section>
+</body>
+</html>
