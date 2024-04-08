@@ -81,22 +81,25 @@ function handleFormSubmission() {
         // Directory where uploaded files will be stored within your project directory
         $uploadDirectory = __DIR__ . '/tmp';
 
-        // Move uploaded files to the upload directory
-        move_uploaded_file($_FILES['csv']['tmp_name'], $uploadDirectory . '/' . $_FILES['csv']['name']);
-        move_uploaded_file($_FILES['hero_photo']['tmp_name'], $uploadDirectory . '/' . $_FILES['hero_photo']['name']);
-        move_uploaded_file($_FILES['additional_photo_1']['tmp_name'], $uploadDirectory . '/' . $_FILES['additional_photo_1']['name']);
-        move_uploaded_file($_FILES['additional_photo_2']['tmp_name'], $uploadDirectory . '/' . $_FILES['additional_photo_2']['name']);
-        move_uploaded_file($_FILES['additional_photo_3']['tmp_name'], $uploadDirectory . '/' . $_FILES['additional_photo_3']['name']);
-        move_uploaded_file($_FILES['additional_photo_4']['tmp_name'], $uploadDirectory . '/' . $_FILES['additional_photo_4']['name']);
+        // Generate unique identifiers for filenames
+        $uniqueId = uniqid();
+
+        // Move uploaded files to the upload directory with unique filenames
+        move_uploaded_file($_FILES['csv']['tmp_name'], $uploadDirectory . '/' . $uniqueId . '_' . $_FILES['csv']['name']);
+        move_uploaded_file($_FILES['hero_photo']['tmp_name'], $uploadDirectory . '/' . $uniqueId . '_' . $_FILES['hero_photo']['name']);
+        move_uploaded_file($_FILES['additional_photo_1']['tmp_name'], $uploadDirectory . '/' . $uniqueId . '_' . $_FILES['additional_photo_1']['name']);
+        move_uploaded_file($_FILES['additional_photo_2']['tmp_name'], $uploadDirectory . '/' . $uniqueId . '_' . $_FILES['additional_photo_2']['name']);
+        move_uploaded_file($_FILES['additional_photo_3']['tmp_name'], $uploadDirectory . '/' . $uniqueId . '_' . $_FILES['additional_photo_3']['name']);
+        move_uploaded_file($_FILES['additional_photo_4']['tmp_name'], $uploadDirectory . '/' . $uniqueId . '_' . $_FILES['additional_photo_4']['name']);
 
         // Read form data
         $templateName = $_POST['template'];
-        $csvFile = $uploadDirectory . '/' . $_FILES['csv']['name'];
-        $heroPhoto = $uploadDirectory . '/' . $_FILES['hero_photo']['name'];
-        $additionalPhoto1 = $uploadDirectory . '/' . $_FILES['additional_photo_1']['name'];
-        $additionalPhoto2 = $uploadDirectory . '/' . $_FILES['additional_photo_2']['name'];
-        $additionalPhoto3 = $uploadDirectory . '/' . $_FILES['additional_photo_3']['name'];
-        $additionalPhoto4 = $uploadDirectory . '/' . $_FILES['additional_photo_4']['name'];
+        $csvFile = $uploadDirectory . '/' . $uniqueId . '_' . $_FILES['csv']['name'];
+        $heroPhoto = $uploadDirectory . '/' . $uniqueId . '_' . $_FILES['hero_photo']['name'];
+        $additionalPhoto1 = $uploadDirectory . '/' . $uniqueId . '_' . $_FILES['additional_photo_1']['name'];
+        $additionalPhoto2 = $uploadDirectory . '/' . $uniqueId . '_' . $_FILES['additional_photo_2']['name'];
+        $additionalPhoto3 = $uploadDirectory . '/' . $uniqueId . '_' . $_FILES['additional_photo_3']['name'];
+        $additionalPhoto4 = $uploadDirectory . '/' . $uniqueId . '_' . $_FILES['additional_photo_4']['name'];
         $agentName = $_POST['agent'];
 
         // Check if URL is set
@@ -121,10 +124,10 @@ function handleFormSubmission() {
 
                 // Generate QR code file path
 				$qrCodeFileName = 'qr_code.png';
-                $qrCodeFile = './tmp/' . $qrCodeFileName;
+                $qrCodeFile = './tmp/' . $uniqueId . '_' . $qrCodeFileName;
 
                 // Generate QR code locally
-                generateQRCode($url, $logo, './tmp/' . $qrCodeFileName);
+                generateQRCode($url, $logo, './tmp/' . $uniqueId . '_' . $qrCodeFileName);
 
                 // Replace placeholders in template content with actual data
                 $templateContent = replacePlaceholders($templateContent, $csvData, $agentData, $heroPhoto, [$additionalPhoto1, $additionalPhoto2, $additionalPhoto3, $additionalPhoto4], $qrCodeFile, $agentName);
