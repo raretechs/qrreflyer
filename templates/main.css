@@ -39,12 +39,23 @@ body {
 
 .hero {
     width: 100%;
+    max-height: 425px; /* Set the maximum visible height for the hero section */
     overflow: hidden;
+    display: flex;
+    align-items: center; /* Center the content vertically */
+}
+
+.hero .hero-image {
+    width: 100%;
+    height: 100%; /* Ensure the hero image fills the entire height of the hero section */
+    overflow: hidden;
+    position: relative;
 }
 
 .hero .hero-image img {
     width: 100%;
-    display: block;
+    height: 100%;
+    object-fit: cover; /* Fill the container while maintaining aspect ratio and cropping if necessary */
 }
 
 .body {
@@ -130,4 +141,13 @@ body {
     padding: 10px;
     width: 100%;
 	line-height: 0.1; /* Adjust line spacing */
+}
+
+@media print {
+    body {
+        -webkit-print-color-adjust: exact; /* For Chrome and Safari */
+        color-adjust: exact; /* For Firefox */
+		transform: scale(1); /* Force printing at 100% scale */
+        transform-origin: top left; /* Set the origin of the scaling to the top left corner */
+    }
 }
