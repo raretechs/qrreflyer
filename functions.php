@@ -20,40 +20,25 @@ function readTemplate($templateName) {
     }
 }
 
-// Function to parse CSV data
+// Function to parse CSV data and return an array of arrays
 function parseCSVData($csvFile) {
-    // Parse CSV file and return data as associative array
+    $csvData = [];
     if (($handle = fopen($csvFile, "r")) !== FALSE) {
         // Read the headers
         $headers = fgetcsv($handle, 1000, ",");
-
-        // Initialize the data array
-        $data = [];
-
+        
         // Read each row of data
         while (($row = fgetcsv($handle, 1000, ",")) !== FALSE) {
-            // If the number of columns doesn't match the number of headers, skip the row
-            if (count($row) !== count($headers)) {
-                echo "Error: Number of columns in a row doesn't match the number of headers. Skipping row.<br>";
-                echo "Headers: " . implode(", ", $headers) . "<br>";
-                echo "Row: " . implode(", ", $row) . "<br>";
-                continue;
-            }
-
             // Combine headers with row data to create associative array
             $rowData = array_combine($headers, $row);
-
-            // Replace empty values represented by double quotes with null
-            $rowData = array_map(function($value) {
-                return $value === "" ? null : $value;
-            }, $rowData);
-
-            // Add row data to the result array
-            $data[] = $rowData;
+            // Add row data to the csvData array
+            $csvData[] = $rowData;
         }
-
+        
         fclose($handle);
-        return $data;
+        
+        // Return the array of arrays representing the CSV data
+        return $csvData;
     } else {
         return false;
     }
@@ -61,49 +46,69 @@ function parseCSVData($csvFile) {
 
 // Function to parse agent data from agent.txt in agent's subdirectory
 function parseAgentData($agentName) {
-    $agentDirectory = __DIR__ . '/agents/' . $agentName; // Path to agent's directory
-    $agentFile = $agentDirectory . '/' . $agentName . '.txt'; // Path to agent's txt file
+    // Remove the .txt extension from the agent name
+    $agentNameWithoutExtension = basename($agentName, '.txt');
+    //echo "Agent Name without Extension: $agentNameWithoutExtension<br>";
 
-    // Debugging: Display the paths
-    //echo "Agent File Path: $agentFile<br>";
+    // Construct the agent directory path
+    $agentDirectory = __DIR__ . '/agents/' . $agentNameWithoutExtension;
+    //echo "Agent Directory: $agentDirectory<br>";
 
-    if (file_exists($agentFile)) {
-        $agentData = file($agentFile, FILE_IGNORE_NEW_LINES); // Read file into an array, ignoring newlines
-        
-        // Initialize an empty array to store parsed data
-        $parsedData = [];
+    // Initialize agent photo path
+    $agentPhoto = '';
 
-        // Loop through each line in the agent file
-        foreach ($agentData as $line) {
-            // Split the line into label and value using ':'
-            $parts = explode(':', $line, 2);
-            if (count($parts) == 2) {
-                $label = trim($parts[0]); // Trim any leading/trailing whitespace
-                $value = trim($parts[1]); // Trim any leading/trailing whitespace
-                $parsedData[$label] = $value; // Store label-value pair in parsed data array
-            }
-        }
-
-        // Return the parsed agent data with default values if any field is missing
-        return array(
-            'Agent Photo' => isset($parsedData['Agent Photo']) ? trim($parsedData['Agent Photo']) : 'agent_photo.jpg',
-            'Agent Name' => isset($parsedData['Agent Name']) ? trim($parsedData['Agent Name']) : $agentName,
-            'Agent Title' => isset($parsedData['Agent Title']) ? trim($parsedData['Agent Title']) : 'Real Estate Agent',
-            'Agent License Number' => isset($parsedData['Agent DRE Number']) ? trim($parsedData['Agent DRE Number']) : '123456',
-            'Agent Mobile' => isset($parsedData['Agent Phone Number']) ? trim($parsedData['Agent Phone Number']) : '(999) 888-1234',
-            'Agent Office' => isset($parsedData['Agent Office']) ? trim($parsedData['Agent Office']) : '(999) 777-4321',
-            'Agent Email' => isset($parsedData['Agent Email']) ? trim($parsedData['Agent Email']) : 'office@domain.com',
-            'Agent Website' => isset($parsedData['Agent Website']) ? trim($parsedData['Agent Website']) : 'www.domain.com'
-        );
+    // Check if the agent directory exists
+    if (file_exists($agentDirectory) && is_dir($agentDirectory)) {
+        // Generate agent photo path
+        $agentPhoto = "agents/$agentNameWithoutExtension/agent_photo.jpg";
+    } else {
+        // Use a default agent photo path if the directory does not exist
+        $agentPhoto = "agents/default/agent_photo.jpg";
     }
 
+    // Check if the agent photo path is not empty
+    if (!empty($agentPhoto)) {
+        // Read agent data from agent.txt file
+        $agentFilePath = "$agentDirectory/agent.txt";
+        //echo "Agent Text File Full Path and Name: $agentFilePath<br>";
+        if (file_exists($agentFilePath)) {
+            // Read agent data from file
+            $agentData = file($agentFilePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            $parsedData = [];
+            foreach ($agentData as $line) {
+                // Split the line into key and value
+                list($key, $value) = explode(': ', $line, 2);
+                // Convert key to lowercase and remove spaces
+                $key = strtolower(str_replace(' ', '', $key));
+                // Map the data to the parsedData array
+                $parsedData[$key] = $value;
+            }
+            // Add agent photo path to the parsed data
+            $parsedData['Agent Photo'] = $agentPhoto;
+            
+			// Print parsed data
+            //echo "Parsed Data: <pre>";
+            //print_r($parsedData);
+            //echo "</pre>";
+            
+			// Return parsed agent data
+            return $parsedData;
+        }
+    }
+
+    // Return false if agent data cannot be parsed
+    return false;
+}
+
+// Function to get default agent data
+function getDefaultAgentData($agentNameWithoutExtension) {
     // Default agent data if file not found
     return array(
-        'Agent Photo' => 'agent_photo.jpg',
-        'Agent Name' => $agentName,
+        'Agent Photo' => "$agentNameWithoutExtension/agent_photo.jpg",
+        'Agent Name' => $agentNameWithoutExtension,
         'Agent Title' => 'Real Estate Agent',
         'Agent License Number' => '123456',
-        'Agent Mobile' => '(999) 888-1234',
+        'Agent Mobile' => '(969) 888-1234',
         'Agent Office' => '(999) 777-4321',
         'Agent Email' => 'office@domain.com',
         'Agent Website' => 'www.domain.com'
@@ -118,31 +123,55 @@ function generateQRCode($url, $logo, $qrCodeFile) {
     // Load logo image
     $logoImg = imagecreatefrompng($logo);
 
-    // Add whitespace padding around the logo
-    $margin = 10; // Adjust padding as needed
-    $logoWidth = imagesx($logoImg);
-    $logoHeight = imagesy($logoImg);
-    $paddedLogoWidth = $logoWidth + 2 * $margin;
-    $paddedLogoHeight = $logoHeight + 2 * $margin;
-    $paddedLogo = imagecreatetruecolor($paddedLogoWidth, $paddedLogoHeight);
-    $whiteColor = imagecolorallocate($paddedLogo, 255, 255, 255);
-    imagefill($paddedLogo, 0, 0, $whiteColor);
-    imagecopy($paddedLogo, $logoImg, $margin, $margin, 0, 0, $logoWidth, $logoHeight);
-
-    // Merge padded logo onto the QR code
+    // Load QR code image
     $qrCodeImg = imagecreatefrompng($qrCodeFile);
+
+    // Get QR code image dimensions
     $qrCodeWidth = imagesx($qrCodeImg);
     $qrCodeHeight = imagesy($qrCodeImg);
-    $logoX = ($qrCodeWidth - $paddedLogoWidth) / 2;
-    $logoY = ($qrCodeHeight - $paddedLogoHeight) / 2;
-    imagecopy($qrCodeImg, $paddedLogo, $logoX, $logoY, 0, 0, $paddedLogoWidth, $paddedLogoHeight);
 
-    // Save the merged QR code with logo
+    // Set maximum logo size (percentage of QR code area)
+    $maxLogoSizePercent = 0.3; // Adjust as needed
+
+    // Calculate maximum allowable logo dimensions
+    $maxLogoWidth = intval($qrCodeWidth * $maxLogoSizePercent);
+    $maxLogoHeight = intval($qrCodeHeight * $maxLogoSizePercent);
+
+    // Get logo image dimensions
+    $logoWidth = imagesx($logoImg);
+    $logoHeight = imagesy($logoImg);
+
+    // Scale logo if it exceeds maximum dimensions
+    if ($logoWidth > $maxLogoWidth || $logoHeight > $maxLogoHeight) {
+        // Calculate scaling factor
+        $scale = min($maxLogoWidth / $logoWidth, $maxLogoHeight / $logoHeight);
+
+        // Calculate scaled dimensions
+        $scaledWidth = $logoWidth * $scale;
+        $scaledHeight = $logoHeight * $scale;
+
+        // Create a new image with scaled dimensions
+        $scaledLogo = imagescale($logoImg, $scaledWidth, $scaledHeight);
+
+        // Free up memory from original logo
+        imagedestroy($logoImg);
+
+        // Assign scaled logo to original logo image
+        $logoImg = $scaledLogo;
+    }
+
+    // Calculate logo position (centered within QR code)
+    $logoX = intval(($qrCodeWidth - imagesx($logoImg)) / 2);
+    $logoY = intval(($qrCodeHeight - imagesy($logoImg)) / 2);
+
+    // Merge logo onto the QR code
+    imagecopy($qrCodeImg, $logoImg, $logoX, $logoY, 0, 0, imagesx($logoImg), imagesy($logoImg));
+
+    // Save the QR code with logo
     imagepng($qrCodeImg, $qrCodeFile);
 
     // Free up memory
     imagedestroy($logoImg);
-    imagedestroy($paddedLogo);
     imagedestroy($qrCodeImg);
 }
 
