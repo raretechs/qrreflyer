@@ -120,10 +120,11 @@ function handleFormSubmission() {
                 $logo = 'qr-logo.png'; // Replace 'path_to_your_logo.png' with the actual path to your logo image
 
                 // Generate QR code file path
-                $qrCodeFile = 'qr_code.png';
+				$qrCodeFileName = 'qr_code.png';
+                $qrCodeFile = './tmp/' . $qrCodeFileName;
 
                 // Generate QR code locally
-                generateQRCode($url, $logo, $qrCodeFile);
+                generateQRCode($url, $logo, './tmp/' . $qrCodeFileName);
 
                 // Replace placeholders in template content with actual data
                 $templateContent = replacePlaceholders($templateContent, $csvData, $agentData, $heroPhoto, [$additionalPhoto1, $additionalPhoto2, $additionalPhoto3, $additionalPhoto4], $qrCodeFile, $agentName);
