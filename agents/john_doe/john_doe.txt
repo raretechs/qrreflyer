@@ -3,4 +3,3 @@ Agent DRE Number: 01010011
 Agent Phone Number: (999) 888-1234
 Agent Email: jdoe@webdomain.com
 Agent Website: johndoe.webdomain.com
-Agent Photo: jdoe-headshot.jpg
