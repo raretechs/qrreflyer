@@ -1,0 +1,56 @@
+###############################################################################
+# QRReflyer
+###############################################################################
+
+#
+# Runtime
+#
+tmp/
+error_log
+*.log
+
+#
+# Database
+#
+data/
+*.sqlite
+*.sqlite3
+*.db
+
+#
+# Uploaded Files
+#
+uploads/
+
+#
+# Legacy Agent Storage (Removed in v1.1)
+#
+agents/
+
+#
+# Third Party Libraries
+# Installed separately (Composer/manual install)
+#
+tcpdf/
+phpqrcode/
+
+#
+# Local Configuration
+#
+.env
+config.local.php
+
+#
+# IDE / Operating System
+#
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+#
+# Backup Files
+#
+*.bak
+*.backup*
+*~

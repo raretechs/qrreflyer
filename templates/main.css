@@ -20,6 +20,7 @@ body {
 .header .left h1 {
     font-size: 25px; /* Adjust font size for property address */
     line-height: .5; /* Reduce line spacing */
+	font-variant: small-caps;
 }
 
 .header .left h2 {
@@ -39,7 +40,7 @@ body {
 
 .hero {
     width: 100%;
-    max-height: 425px; /* Set the maximum visible height for the hero section */
+    max-height: 345px; /* Set the maximum visible height for the hero section */
     overflow: hidden;
     display: flex;
     align-items: center; /* Center the content vertically */
@@ -76,18 +77,18 @@ body {
 
 .body .gallery {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 0fr);
     grid-gap: 5px; /* Adjust gap between rows */
-    grid-column-gap: 5px; /* Adjust gap between columns */
 }
 
 .body .gallery img {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
+    max-width: 160px; /* Adjust for size of the gallery images MUST ADJUST ALL VALUES */
+    max-height: 160px; /* Adjust for size of the gallery images MUST ADJUST ALL VALUES */
+    width: 160px; /* Adjust for size of the gallery images MUST ADJUST ALL VALUES */
+    height: 160px; /* Adjust for size of the gallery images MUST ADJUST ALL VALUES */
     object-fit: cover;
-	border: 4px solid #900305; /* Add border around each image */
+    object-position: center;
+    border: 4px solid #900305;
 }
 
 .contact_and_scan {

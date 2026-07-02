@@ -10,29 +10,35 @@ function replacePlaceholders($templateContent, $csvData, $agentData, $heroPhoto,
     // Loop through each row of CSV data
     foreach ($csvData as $rowData) {
         // Constructing the complete address
-        $completeAddress = isset($rowData['Street Number Numeric']) ? $rowData['Street Number Numeric'] : '';
-        $completeAddress .= !empty($rowData['Street Dir Prefix']) ? ' ' . $rowData['Street Dir Prefix'] : '';
-        $completeAddress .= !empty($rowData['Street Name']) ? ' ' . $rowData['Street Name'] : '';
-        $completeAddress .= !empty($rowData['Street Suffix']) ? ' ' . $rowData['Street Suffix'] : '';
-        $completeAddress .= !empty($rowData['Street Dir Suffix']) ? ' ' . $rowData['Street Dir Suffix'] : '';
-        $completeAddress .= !empty($rowData['Street Number Extension']) ? ' ' . $rowData['Street Number Extension'] : '';
+        $completeAddress = isset($rowData['StreetNumberNumeric']) ? $rowData['StreetNumberNumeric'] : '';
+        $completeAddress .= !empty($rowData['StreetDirPrefix']) ? ' ' . $rowData['StreetDirPrefix'] : '';
+        $completeAddress .= !empty($rowData['StreetName']) ? ' ' . $rowData['StreetName'] : '';
+        $completeAddress .= !empty($rowData['StreetSuffix']) ? ' ' . $rowData['StreetSuffix'] : '';
+        $completeAddress .= !empty($rowData['StreetDirSuffix']) ? ' ' . $rowData['StreetDirSuffix'] : '';
+        //$completeAddress .= !empty($rowData['Street Number Extension']) ? ' ' . $rowData['Street Number Extension'] : '';
         $completeAddress .= ', ' . (isset($rowData['City']) ? $rowData['City'] : '');
-        $completeAddress .= ', ' . (isset($rowData['State Or Province']) ? $rowData['State Or Province'] : '');
-        $completeAddress .= ' ' . (isset($rowData['Zip Code']) ? $rowData['Zip Code'] : '');
+        $completeAddress .= ', ' . (isset($rowData['StateOrProvince']) ? $rowData['StateOrProvince'] : '');
+        $completeAddress .= ' ' . (isset($rowData['ZipCode']) ? $rowData['ZipCode'] : '');
 
         // Constructing the property details
-        $propertyDetails = ($rowData['Bedrooms Total'] ?? '') . ' BD | ';
-        $propertyDetails .= ($rowData['Bathrooms Total Integer'] ?? '') . ' BA | ';
-        $propertyDetails .= ($rowData['Living Area'] ?? '') . ' SQFT | ';
-        $propertyDetails .= ($rowData['Lot Size Square Feet'] ?? '') . ' SQFT LOT';
+        $propertyDetails = ($rowData['BedroomsTotal'] ?? '') . ' BD | ';
+        $propertyDetails .= ($rowData['BathroomsTotalInteger'] ?? '') . ' BA | ';
+        $propertyDetails .= ($rowData['LivingArea'] ?? '') . ' SQFT | ';
+        $propertyDetails .= ($rowData['LotSizeSquareFeet'] ?? '') . ' SQFT LOT';
 
+        // Format current price with comma delimiters
+        $currentPrice = isset($rowData['CurrentPrice']) ? number_format($rowData['CurrentPrice']) : '';
+
+        // Limit Property Description to a certain number of characters
+        $propertyDescription = isset($rowData['PublicRemarks']) ? substr($rowData['PublicRemarks'], 0, 730) : '';
         // Replace placeholders with actual CSV data
         $templateContent = str_replace('{Property Address}', htmlentities($completeAddress, ENT_QUOTES, 'utf-8'), $templateContent);
         $templateContent = str_replace('{Property Details}', htmlentities($propertyDetails, ENT_QUOTES, 'UTF-8'), $templateContent);
-        $templateContent = str_replace('{Current Price}', htmlentities($rowData['Current Price'] ?? '', ENT_QUOTES, 'UTF-8'), $templateContent);
-        $templateContent = str_replace('{Property Description}', htmlentities($rowData['Public Remarks'] ?? '', ENT_QUOTES, 'UTF-8'), $templateContent);
+        $templateContent = str_replace('{Current Price}', htmlentities($currentPrice, ENT_QUOTES, 'UTF-8'), $templateContent);
+        $templateContent = str_replace('{Property Description}', htmlentities($propertyDescription, ENT_QUOTES, 'UTF-8'), $templateContent);
     }
-
+    // The rest of your code remains unchanged...
+	
     // Construct relative paths for the images
     $heroPhotoRelativePath = 'tmp/' . basename($heroPhoto);
     $additionalPhotosRelativePaths = [];

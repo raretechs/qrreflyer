@@ -22,26 +22,53 @@ function readTemplate($templateName) {
 
 // Function to parse CSV data and return an array of arrays
 function parseCSVData($csvFile) {
+    $columnsToExtract = [
+        "StreetNumberNumeric",
+        "StreetDirPrefix",
+        "StreetName",
+        "StreetSuffix",
+        "StreetDirSuffix",
+        "City",
+        "StateOrProvince",
+        "ZipCode",
+        "BedroomsTotal",
+        "BathroomsTotalInteger",
+        "LivingArea",
+        "LotSizeSquareFeet",
+        "CurrentPrice",
+        "PublicRemarks"
+    ];
+
     $csvData = [];
-    if (($handle = fopen($csvFile, "r")) !== FALSE) {
-        // Read the headers
-        $headers = fgetcsv($handle, 1000, ",");
-        
-        // Read each row of data
-        while (($row = fgetcsv($handle, 1000, ",")) !== FALSE) {
-            // Combine headers with row data to create associative array
-            $rowData = array_combine($headers, $row);
-            // Add row data to the csvData array
+
+    if (($handle = fopen($csvFile, "r")) !== false) {
+        $headers = fgetcsv($handle, 0, ",");
+
+        if ($headers === false) {
+            fclose($handle);
+            return false;
+        }
+
+        // Remove UTF-8 BOM if present
+        $headers[0] = preg_replace('/^\xEF\xBB\xBF/', '', $headers[0]);
+
+        while (($row = fgetcsv($handle, 0, ",")) !== false) {
+            $rowData = [];
+
+            foreach ($columnsToExtract as $column) {
+                $index = array_search($column, $headers);
+                $rowData[$column] = ($index !== false && isset($row[$index])) ? trim($row[$index]) : "";
+            }
+
             $csvData[] = $rowData;
         }
-        
+
         fclose($handle);
-        
-        // Return the array of arrays representing the CSV data
-        return $csvData;
-    } else {
-        return false;
+
+        return !empty($csvData) ? $csvData : false;
     }
+
+    return false;
 }
 
 // Function to parse agent data from agent.txt in agent's subdirectory
@@ -107,11 +134,11 @@ function getDefaultAgentData($agentNameWithoutExtension) {
         'Agent Photo' => "$agentNameWithoutExtension/agent_photo.jpg",
         'Agent Name' => $agentNameWithoutExtension,
         'Agent Title' => 'Real Estate Agent',
-        'Agent License Number' => '123456',
-        'Agent Mobile' => '(969) 888-1234',
-        'Agent Office' => '(999) 777-4321',
-        'Agent Email' => 'office@domain.com',
-        'Agent Website' => 'www.domain.com'
+        'Agent License Number' => '02220214',
+        'Agent Mobile' => '(951) 384-0656',
+        'Agent Office' => '(951) 384-0656',
+        'Agent Email' => 'FindMyCastle@CastraRealty.com',
+        'Agent Website' => 'www.CastraRealty.com'
     );
 }
 
@@ -123,25 +150,19 @@ function generateQRCode($url, $logo, $qrCodeFile) {
     // Load logo image
     $logoImg = imagecreatefrompng($logo);
 
-    // Load QR code image
-    $qrCodeImg = imagecreatefrompng($qrCodeFile);
-
-    // Get QR code image dimensions
-    $qrCodeWidth = imagesx($qrCodeImg);
-    $qrCodeHeight = imagesy($qrCodeImg);
-
-    // Set maximum logo size (percentage of QR code area)
-    $maxLogoSizePercent = 0.3; // Adjust as needed
-
-    // Calculate maximum allowable logo dimensions
-    $maxLogoWidth = intval($qrCodeWidth * $maxLogoSizePercent);
-    $maxLogoHeight = intval($qrCodeHeight * $maxLogoSizePercent);
-
     // Get logo image dimensions
     $logoWidth = imagesx($logoImg);
     $logoHeight = imagesy($logoImg);
 
-    // Scale logo if it exceeds maximum dimensions
+    // Set desired margin around the logo
+    $margin = 10; // Adjust as needed
+
+    // Calculate maximum allowable logo dimensions
+    $maxLogoSizePercent = 0.3; // Adjust as needed
+    $maxLogoWidth = intval($logoWidth * $maxLogoSizePercent);
+    $maxLogoHeight = intval($logoHeight * $maxLogoSizePercent);
+
+    // Check if the logo needs resizing
     if ($logoWidth > $maxLogoWidth || $logoHeight > $maxLogoHeight) {
         // Calculate scaling factor
         $scale = min($maxLogoWidth / $logoWidth, $maxLogoHeight / $logoHeight);
@@ -160,19 +181,51 @@ function generateQRCode($url, $logo, $qrCodeFile) {
         $logoImg = $scaledLogo;
     }
 
-    // Calculate logo position (centered within QR code)
-    $logoX = intval(($qrCodeWidth - imagesx($logoImg)) / 2);
-    $logoY = intval(($qrCodeHeight - imagesy($logoImg)) / 2);
+    // Create a padded logo image with additional whitespace around the logo
+    $paddedLogoWidth = imagesx($logoImg) + 2 * $margin;
+    $paddedLogoHeight = imagesy($logoImg) + 2 * $margin;
+    $paddedLogoImg = imagecreatetruecolor($paddedLogoWidth, $paddedLogoHeight);
 
-    // Merge logo onto the QR code
-    imagecopy($qrCodeImg, $logoImg, $logoX, $logoY, 0, 0, imagesx($logoImg), imagesy($logoImg));
+    // Fill the padded logo image with white color
+    $white = imagecolorallocate($paddedLogoImg, 255, 255, 255);
+    imagefill($paddedLogoImg, 0, 0, $white);
 
-    // Save the QR code with logo
-    imagepng($qrCodeImg, $qrCodeFile);
+    // Calculate the position to place the logo on the padded image to center it properly
+    $logoX = $margin;
+    $logoY = $margin;
+
+    // Copy the original logo onto the padded image
+    imagecopy($paddedLogoImg, $logoImg, $logoX, $logoY, 0, 0, imagesx($logoImg), imagesy($logoImg));
+
+    // Load QR code image
+    $qrCodeImg = imagecreatefrompng($qrCodeFile);
+
+    // Check if QR code image was loaded successfully
+    if ($qrCodeImg !== false) {
+        // Get QR code image dimensions
+        $qrCodeWidth = imagesx($qrCodeImg);
+        $qrCodeHeight = imagesy($qrCodeImg);
+
+        // Calculate position to place the padded logo on the QR code to center it properly
+        $logoPosX = intval(($qrCodeWidth - $paddedLogoWidth) / 2);
+        $logoPosY = intval(($qrCodeHeight - $paddedLogoHeight) / 2);
+
+        // Merge the padded logo onto the QR code
+        imagecopy($qrCodeImg, $paddedLogoImg, $logoPosX, $logoPosY, 0, 0, $paddedLogoWidth, $paddedLogoHeight);
+
+        // Save the QR code with logo
+        imagepng($qrCodeImg, $qrCodeFile);
+
+        // Free up memory
+        imagedestroy($qrCodeImg);
+    } else {
+        // Error handling: QR code image could not be loaded
+        echo "Error: Failed to load QR code image.";
+    }
 
     // Free up memory
     imagedestroy($logoImg);
-    imagedestroy($qrCodeImg);
+    imagedestroy($paddedLogoImg);
 }
 
 // Function to generate PDF
