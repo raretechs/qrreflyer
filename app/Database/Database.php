@@ -31,37 +31,47 @@ class Database
     private static function migrate(PDO $db): void
     {
         $db->exec("
-            CREATE TABLE IF NOT EXISTS agents (
+            CREATE TABLE IF NOT EXISTS migrations (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-                slug TEXT NOT NULL UNIQUE,
-                display_name TEXT NOT NULL,
-
-                first_name TEXT,
-                last_name TEXT,
-
-                email TEXT,
-                phone TEXT,
-                mobile TEXT,
-
-                dre_license TEXT,
-
-                website TEXT,
-
-                photo_path TEXT,
-
-                bio TEXT,
-
-                facebook TEXT,
-                instagram TEXT,
-                linkedin TEXT,
-                youtube TEXT,
-
-                active INTEGER NOT NULL DEFAULT 1,
-
-                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                migration TEXT NOT NULL UNIQUE,
+                executed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             )
         ");
+
+        $migrationDirectory = Config::basePath() . '/database/migrations';
+
+        if (!is_dir($migrationDirectory)) {
+            return;
+        }
+
+        $migrationFiles = glob($migrationDirectory . '/*.sql');
+        sort($migrationFiles);
+
+        foreach ($migrationFiles as $migrationFile) {
+            $migrationName = basename($migrationFile);
+
+            $stmt = $db->prepare("SELECT COUNT(*) FROM migrations WHERE migration = :migration");
+            $stmt->execute(['migration' => $migrationName]);
+
+            if ((int)$stmt->fetchColumn() > 0) {
+                continue;
+            }
+
+            $sql = file_get_contents($migrationFile);
+
+            $db->beginTransaction();
+
+            try {
+                $db->exec($sql);
+
+                $insert = $db->prepare("INSERT INTO migrations (migration) VALUES (:migration)");
+                $insert->execute(['migration' => $migrationName]);
+
+                $db->commit();
+            } catch (Throwable $e) {
+                $db->rollBack();
+                throw $e;
+            }
+        }
     }
 }
